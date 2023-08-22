@@ -1,0 +1,117 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 13/08/2023 19:47:34
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Problema 2
+00000000                             3  * Written by : Ana Laura Torres Gonzalez
+00000000                             4  * Date       : 12/08/2023
+00000000                             5  * Description: Problema 2 del laboratorio 2
+00000000                             6  *-----------------------------------------------------------
+00000000  =0000000D                  7  CR  EQU       $0D
+00000000  =0000000A                  8  LF  EQU       $0A
+00000000                             9  
+00001000                            10  START: ORG    $1000
+00001000                            11  * Carga diálogo WRITE en memoria
+00001000  43F9 0000109C             12      LEA WRITE,A1
+00001006  343C 0000                 13      MOVE #0,D2
+0000100A  367C 0001                 14      MOVE #1,A3
+0000100E                            15  * Muestra mensaje WRITE
+0000100E  303C 000E                 16      MOVE #14,D0
+00001012  4E4F                      17      TRAP #15
+00001014                            18  * Lee input de WRITE
+00001014  303C 0002                 19      MOVE #2,D0 ;lee el input de la cadena
+00001018  4E4F                      20      TRAP #15
+0000101A  3049                      21      MOVE A1,A0
+0000101C  3609                      22      MOVE A1,D3
+0000101E                            23  
+0000101E                            24  *Mostrar mensaje CHOOSE
+0000101E                            25  SR_CHOOSE:
+0000101E  43F9 000010AD             26      LEA CHOOSE,A1     
+00001024  303C 000E                 27      MOVE #14,D0
+00001028  4E4F                      28      TRAP #15
+0000102A  1801                      29      MOVE.B D1,D4
+0000102C                            30   
+0000102C                            31  * Lee input CHOOSE
+0000102C  303C 0004                 32      MOVE #4,D0 ;Lee input num
+00001030  4E4F                      33      TRAP #15
+00001032                            34  * Elección del usuario 1: mayusculas, 2: minusculas   
+00001032  B23C 0001                 35      CMP.B #1,D1
+00001036  6700 000C                 36      BEQ  LOOP_UPPER ; pasa a subrutina de mayusculas si 1
+0000103A  B23C 0002                 37      CMP.B #2,D1
+0000103E  6700 002A                 38      BEQ LOOP_LOWER ; pasa a subrutina de minusculas si 2
+00001042  66DA                      39      BNE SR_CHOOSE
+00001044                            40     
+00001044                            41  *Subrutina para mayusculas
+00001044                            42  
+00001044                            43  LOOP_UPPER:
+00001044  4A10                      44      TST.B (A0) ; si es 0, pasa a termina, pasa a subrutina FINISHED
+00001046  6700 0048                 45      BEQ FINISHED 
+0000104A                            46  
+0000104A  0C10 0061                 47      CMP.B #97,(A0)  ; Comparar con ASCII el valor de 'a'
+0000104E  6D00 000E                 48      BLT NOT_LOWER   ; Si es por debajo de 'a', no es minúscula
+00001052  0C10 007A                 49      CMP.B #122,(A0) ; Comparar con ASCII el valor de 'z'
+00001056  6E00 0006                 50      BGT NOT_LOWER   ; Si es por encima de 'z', no es minúscula
+0000105A  0410 0020                 51      SUB.B #32,(A0)   ; Transformar a mayúscula
+0000105E                            52  
+0000105E                            53  NOT_LOWER:
+0000105E  0C18 0020                 54      CMP.B #32,(A0)+ ; Compara con ASCII el valor del espacio
+00001062  6600 0004                 55      BNE NOT_SPACE_U   ; Si no es espacio, Realizar subrutina 
+00001066  60DC                      56      BRA LOOP_UPPER  ; Regresar al loop
+00001068                            57  
+00001068                            58  NOT_SPACE_U:
+00001068  60DA                      59      BRA LOOP_UPPER   ; Regresar al loop
+0000106A                            60  
+0000106A                            61  *Subrutina para minusculas
+0000106A                            62  
+0000106A                            63  LOOP_LOWER:
+0000106A  4A10                      64      TST.B (A0) ;si es 0, pasa a termina, pasa a sub rutina FINISHED
+0000106C  6700 0022                 65      BEQ FINISHED 
+00001070                            66  
+00001070  0C10 0041                 67      CMP.B #65,(A0)  ; Comparar con ASCII el valor de 'A'
+00001074  6D00 000E                 68      BLT NOT_UPPER   ; Si es por debajo de 'A', no es mayúscula
+00001078  0C10 005A                 69      CMP.B #90,(A0) ; Compara con ASCII el valor de 'Z'
+0000107C  6E00 0006                 70      BGT NOT_UPPER   ; Si es por encima de 'Z', no es mayúscula
+00001080  0610 0020                 71      ADD.B #32,(A0)   ; Transformar a minúscula
+00001084                            72  
+00001084                            73  NOT_UPPER:
+00001084  0C18 0020                 74      CMP.B #32,(A0)+ ;  Compara con ASCII el valor del espacio
+00001088  6600 0004                 75      BNE NOT_SPACE_L   ; Compara con ASCII el valor del espacio
+0000108C  60DC                      76      BRA LOOP_LOWER  ; Regresar al loop
+0000108E                            77  
+0000108E                            78  
+0000108E                            79  NOT_SPACE_L:
+0000108E  60DA                      80      BRA LOOP_LOWER   ; Regresar al loop
+00001090                            81     
+00001090                            82  FINISHED:
+00001090  3243                      83      MOVE D3,A1 ;Set A1 to D2
+00001092  303C 000E                 84      MOVE #14,D0
+00001096  4E4F                      85      TRAP #15
+00001098  FFFF FFFF                 86      SIMHALT
+0000109C                            87  
+0000109C                            88  
+0000109C                            89  *Mensajes
+0000109C= 45 53 43 52 49 42 ...     90  WRITE: DC.B    'ESCRIBE ALGO: ',CR,LF,0
+000010AD= 54 72 61 6E 73 66 ...     91  CHOOSE: DC.B    'Transforma a 1-MAYUSCULAS, 2-MINUSCULAS: ',CR,LF,0
+000010D9                            92          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CHOOSE              10AD
+CR                  D
+FINISHED            1090
+LF                  A
+LOOP_LOWER          106A
+LOOP_UPPER          1044
+NOT_LOWER           105E
+NOT_SPACE_L         108E
+NOT_SPACE_U         1068
+NOT_UPPER           1084
+SR_CHOOSE           101E
+START               1000
+WRITE               109C
